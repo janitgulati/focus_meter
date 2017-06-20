@@ -25,16 +25,22 @@ module.exports = {
     getToken: function(username, pass, cb) {
         $.ajax({
             type: 'POST',
-            url: '/api/obtain-auth-token/',
+            url: '/account/login/',
             data: {
                 username: username,
                 password: pass
             },
             success: function(res){
-                cb({
-                    authenticated: true,
-                    token: res.token
-                })
+                debugger;
+                if (res.successful){
+                    cb({
+                        authenticated: true,
+                        token: res.token
+                    })
+                }
+                else{
+                    alert(res.reason);
+                }
             }
         })
     }, 

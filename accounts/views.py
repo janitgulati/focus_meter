@@ -28,69 +28,40 @@ class LoginAccount(APIView):
     reason = ''
 
     def get(self, request):
-        return self.on_get(request)
-
+        pass
 
     def post(self, request):
-        return self.on_post(request)
-
-
-    def on_get(self, request):
-
-        email = request.GET.get('email')
-        username = request.GET.get('username')
-        password = request.GET.get('password')
-        token = None
-        try:
-            user = User.objects.all().get(username=username)
-            if user is not None and user.check_password(password):
-
-                if user.is_active:
-                    jira_verify_obj = JIRA(server='https://mpulsemobile.atlassian.net', basic_auth=(username, password),
-                                           max_retries=0, logging=False)
-                    if not jira_verify_obj:
-                        self.login_successful = False
-                        user.delete()
-                        self.reason = 'Your Password has expired. Update and Re-Register'
-                    else:
-                        token, created = Token.objects.get_or_create(user=user)
-                        request.session['auth'] = token.key
-                        self.login_successful = True
-            else:
-                    self.login_successful = False
-                    self.reason = 'Incorrect Username or Password.'
-        except Exception as e:
-            self.login_successful = False
-            self.reason = 'Your Password has expired. Update and Re-Register'
-
-        response_data = {'successful':self.login_successful, 'reason': self.reason, 'token':token.key if token else None}
-        return HttpResponse(json.dumps(response_data), status=201, content_type='application/json')
-
-
-    def on_post(self, request):
-
-        registration_error = 'None'
         body = request.data
         username = body.get('username')
         password = body.get('password')
-        email_id = body.get('email-id')
+        token = None
 
         try:
-            jira_verify_obj = JIRA(server='https://mpulsemobile.atlassian.net', basic_auth=(username, password), max_retries=0, logging=False)
+
+            jira_verify_obj = JIRA(server='https://mpulsemobile.atlassian.net', basic_auth=(username, password),
+                                   max_retries=0, logging=False)
             if not jira_verify_obj:
-                self.is_registered = False
-                registration_error = 'Invalid JIRA Credentials'
+                self.login_successful = False
+                self.reason = 'Invalid username or password'
             else:
-                user = User.objects.create_user(username, email_id, password)
+                user = User.objects.filter(username=username).first()
+                if user is not None and not user.check_gipassword(password):
+                    user.set_password(password)
+                else:
+                    user = User.objects.create_user(username, password)
                 user.save()
-        except JIRAError as e:
-            self.is_registered = False
-            registration_error = "Username and Password combination doesn't match any Active User."
+                token, created = Token.objects.get_or_create(user=user)
 
         except Exception as e:
-            self.is_registered = False
-            registration_error = 'Duplicate Entry for Username %s'%username
+            self.login_successful = False
+            self.reason = 'Invalid username or password'
 
-        response_data = {'registered': self.is_registered, 'error': registration_error}
+        response_data = {
+            'successful': self.login_successful,
+            'reason': self.reason,
+            'token': token.key if token else None
+        }
+
         return HttpResponse(json.dumps(response_data), status=201, content_type='application/json')
+
 

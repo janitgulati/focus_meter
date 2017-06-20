@@ -2,12 +2,14 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.template import loader
 from rest_framework import viewsets, response, permissions
-
+from rest_framework.generics import CreateAPIView
 from .serializers import UserSerializer
 
+
 def index(request):
-	template=loader.get_template('index2.html')
-	return HttpResponse(template.render(request))
+    template = loader.get_template('index2.html')
+    return HttpResponse(template.render(request))
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -19,3 +21,11 @@ class UserViewSet(viewsets.ModelViewSet):
             return response.Response(UserSerializer(request.user,
                 context={'request':request}).data)
         return super(UserViewSet, self).retrieve(request, pk)
+
+
+class CreateUserView(CreateAPIView):
+    model = UserSerializer
+    permission_classes = [
+        permissions.AllowAny # Or anon users can't register
+    ]
+    serializer_class = UserSerializer

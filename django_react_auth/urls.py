@@ -15,15 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-from api import views
 from django.views.generic import TemplateView
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import RedirectView
 
 urlpatterns = [
     url(r'^app/$', csrf_exempt(TemplateView.as_view(template_name='index.html')), name="app"),
+    url(r'^account/', include('accounts.urls', namespace="accounts")),
     url(r'^api/', include('api.urls')),
     url(r'^admin/',include(admin.site.urls)),
     url(r'^$', RedirectView.as_view(pattern_name='app', permanent=True)),
 ]
-    
+

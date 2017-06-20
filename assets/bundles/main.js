@@ -35329,16 +35329,21 @@
 	    getToken: function (username, pass, cb) {
 	        $.ajax({
 	            type: 'POST',
-	            url: '/api/obtain-auth-token/',
+	            url: '/account/login/',
 	            data: {
 	                username: username,
 	                password: pass
 	            },
 	            success: function (res) {
-	                cb({
-	                    authenticated: true,
-	                    token: res.token
-	                });
+	                debugger;
+	                if (res.successful) {
+	                    cb({
+	                        authenticated: true,
+	                        token: res.token
+	                    });
+	                } else {
+	                    alert(res.reason);
+	                }
 	            }
 	        });
 	    }
@@ -35375,8 +35380,14 @@
 	            'form',
 	            { onSubmit: this.handleSubmit },
 	            React.createElement('input', { type: 'text', placeholder: 'username', ref: 'username' }),
+	            ' ',
+	            React.createElement('br', null),
 	            React.createElement('input', { type: 'password', placeholder: 'password', ref: 'pass' }),
-	            React.createElement('input', { type: 'submit' })
+	            ' ',
+	            React.createElement('br', null),
+	            React.createElement('input', { type: 'submit' }),
+	            ' ',
+	            React.createElement('br', null)
 	        );
 	    }
 	});
