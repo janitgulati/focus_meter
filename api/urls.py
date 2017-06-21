@@ -5,6 +5,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken.views import obtain_auth_token
 
 from .views import UserViewSet
+from .views import Sprints
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -12,5 +13,6 @@ router.register(r'users', UserViewSet)
 urlpatterns = router.urls
 
 urlpatterns += [
-    url(r'^obtain-auth-token/$', csrf_exempt(obtain_auth_token))
+    url(r'^obtain-auth-token/$', csrf_exempt(obtain_auth_token)),
+    url(r'^sprints/$', Sprints.as_view(), name="sprints")
 ]

@@ -48,7 +48,7 @@ class LoginAccount(APIView):
                 if user is not None and not user.check_password(password):
                     user.set_password(password)
                 elif user is None:
-                    user = User.objects.create_user(username, password)
+                    user = User.objects.create_user(username, password=password)
                 user.save()
                 token, created = Token.objects.get_or_create(user=user)
 

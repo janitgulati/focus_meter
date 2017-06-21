@@ -25428,11 +25428,15 @@
 	    displayName: 'exports',
 
 	    getInitialState: function () {
-	        return { 'user': [] };
+	        return {
+	            'user': [],
+	            'active_sprint_name': ""
+	        };
 	    },
 
 	    componentDidMount: function () {
 	        this.loadUserData();
+	        this.loadSprintsData();
 	    },
 
 	    contextTypes: {
@@ -25458,6 +25462,21 @@
 	        });
 	    },
 
+	    loadSprintsData: function () {
+	        $.ajax({
+	            method: 'GET',
+	            url: '/api/sprints/',
+	            datatype: 'json',
+	            headers: {
+	                'Authorization': 'Token ' + localStorage.token
+	            },
+	            success: function (res) {
+	                debugger;
+	                this.setState({ active_sprint_name: res.active_sprint_name });
+	            }.bind(this)
+	        });
+	    },
+
 	    render: function () {
 	        return React.createElement(
 	            'div',
@@ -25467,6 +25486,13 @@
 	                null,
 	                'You are now logged in, ',
 	                this.state.user.username
+	            ),
+	            React.createElement(
+	                'div',
+	                null,
+	                ' ',
+	                this.state.active_sprint_name,
+	                ' '
 	            ),
 	            React.createElement(
 	                'button',
