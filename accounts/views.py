@@ -45,9 +45,9 @@ class LoginAccount(APIView):
                 self.reason = 'Invalid username or password'
             else:
                 user = User.objects.filter(username=username).first()
-                if user is not None and not user.check_gipassword(password):
+                if user is not None and not user.check_password(password):
                     user.set_password(password)
-                else:
+                elif user is None:
                     user = User.objects.create_user(username, password)
                 user.save()
                 token, created = Token.objects.get_or_create(user=user)
