@@ -55,10 +55,50 @@ module.exports = React.createClass({
     render: function() {
         return (
             <div>
-            <h1>You are now logged in, {this.state.user.username}</h1>
-            <div> {this.state.active_sprint_name} </div>
-            <button onClick={this.logoutHandler}>Log out</button>
-            </div>
+
+      <div>
+        <div className="choose-sprint-div text-center">
+          <label htmlFor="choose-sprint"><span className="choose-sprint-span">Select Sprint: </span></label>
+          <select id="choose-sprint" name="choose-sprint" className="selectpicker">
+            <option value="2017-07-05">2017-07-05</option>&gt;
+          </select>
+        </div>
+        <div className="container">
+          <div className="row sprint-data-heading">
+            <p className="sprint-data-heading">Data for sprint ending 2017-07-05:</p>
+            <table className="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Issue Name</th>
+                  <th>Issue Type</th>
+                  <th>Assignee</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>MSXDEV-7500</td>
+                  <td>Bug</td>
+                  <td>Udit Porov</td>
+                </tr>
+                <tr>
+                  <td>MSXDEV-7501</td>
+                  <td>Support</td>
+                  <td>Janit Gulati</td>
+                </tr>
+                <tr>
+                  <td>MSXDEV-7502</td>
+                  <td>New Feature</td>
+                  <td>Nakul Sharma</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+        <h1>You are now logged in, {this.state.user.username}</h1>
+        <div> {this.state.active_sprint_name} </div>
+        <button onClick={this.logoutHandler}>Log out</button>
+        </div>
         )        
     }
 })
