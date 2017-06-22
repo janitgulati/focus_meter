@@ -344,10 +344,25 @@ class Sprints(APIView):
                 # 'type': issue.raw['fields']['issuetype']['name']
                 #  })
 
+                try:
+                    title = issue.raw.get('key')
+                except Exception as e:
+                    title = 'None'
+
+                try:
+                    assignee = issue.raw.get('fields').get('assignee').get('emailAddress')
+                except Exception as e:
+                    assignee = 'None'
+
+                try:
+                    type = issue.raw.get('fields').get('issuetype').get('name')
+                except Exception as e:
+                    type = 'None'
+
                 issues.append(
-                        str(issue.raw['key']) + "#-#" + str(
-                                issue.raw['fields']['assignee']['emailAddress']) + "#-#" +
-                        str(issue.raw['fields']['issuetype']['name'])
+                        str(title) + "#-#" +
+                        str(assignee) + "#-#" +
+                        str(type)
                 )
 
             sprint_info_dict['active_sprint_issues'] = issues

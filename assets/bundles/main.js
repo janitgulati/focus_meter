@@ -25513,29 +25513,25 @@
 	            'div',
 	            null,
 	            React.createElement(
-	                'h1',
-	                null,
-	                'You are now logged in, ',
-	                this.state.user.username
+	                'button',
+	                { onClick: this.logoutHandler, style: { 'margin-right': '40px', 'float': 'right' } },
+	                'Log out'
 	            ),
 	            React.createElement(
 	                'div',
-	                { style: { display: this.state.loader ? 'block' : 'none' } },
-	                ' Loading...'
-	            ),
-	            React.createElement(
-	                'div',
-	                { style: { display: this.state.loader ? 'none' : 'block' } },
+	                { className: 'choose-sprint-div text-center' },
 	                React.createElement(
-	                    'div',
-	                    null,
-	                    ' ',
-	                    this.state.active_sprint_name,
-	                    '   '
+	                    'label',
+	                    { 'for': 'choose-sprint' },
+	                    React.createElement(
+	                        'span',
+	                        { className: 'choose-sprint-span' },
+	                        'Select Sprint: '
+	                    )
 	                ),
 	                React.createElement(
 	                    'select',
-	                    { onChange: this.onSelectLoadSprintData },
+	                    { id: 'choose-sprint', name: 'choose-sprint', className: 'selectpicker', onChange: this.onSelectLoadSprintData },
 	                    this.state.sprints.map(function (sprint) {
 	                        var data = sprint.split('#-#');
 	                        return React.createElement(
@@ -25545,34 +25541,87 @@
 	                            data[0]
 	                        );
 	                    })
-	                ),
-	                React.createElement('br', null),
-	                React.createElement('br', null),
-	                React.createElement(
-	                    'h2',
-	                    null,
-	                    'Active Sprint Issues'
-	                ),
-	                React.createElement(
-	                    'ol',
-	                    null,
-	                    this.state.active_sprint_issues.map(function (_issue) {
-	                        var data = _issue.split('#-#');
-	                        var issue = { 'title': data[0], 'assignee': data[1], 'type': data[2] };
-	                        return React.createElement(
-	                            'li',
-	                            null,
-	                            data[0],
-	                            ', ',
-	                            issue['assignee']
-	                        );
-	                    })
 	                )
 	            ),
 	            React.createElement(
-	                'button',
-	                { onClick: this.logoutHandler },
-	                'Log out'
+	                'div',
+	                { style: { display: this.state.loader ? 'block' : 'none' }, className: 'loader' },
+	                ' '
+	            ),
+	            React.createElement(
+	                'div',
+	                { style: { display: this.state.loader ? 'none' : 'block' } },
+	                React.createElement('br', null),
+	                React.createElement('br', null),
+	                React.createElement(
+	                    'div',
+	                    { className: 'container' },
+	                    React.createElement(
+	                        'div',
+	                        { className: 'row sprint-data-heading' },
+	                        React.createElement(
+	                            'p',
+	                            { className: 'sprint-data-heading' },
+	                            'Data for sprint ending ',
+	                            this.state.active_sprint_name,
+	                            ':'
+	                        ),
+	                        React.createElement(
+	                            'table',
+	                            { className: 'table table-striped table-hover' },
+	                            React.createElement(
+	                                'thead',
+	                                null,
+	                                React.createElement(
+	                                    'tr',
+	                                    null,
+	                                    React.createElement(
+	                                        'th',
+	                                        null,
+	                                        'Issue Name'
+	                                    ),
+	                                    React.createElement(
+	                                        'th',
+	                                        null,
+	                                        'Issue Type'
+	                                    ),
+	                                    React.createElement(
+	                                        'th',
+	                                        null,
+	                                        'Assignee'
+	                                    )
+	                                )
+	                            ),
+	                            React.createElement(
+	                                'tbody',
+	                                null,
+	                                this.state.active_sprint_issues.map(function (_issue) {
+	                                    var data = _issue.split('#-#');
+	                                    var issue = { 'title': data[0], 'assignee': data[1], 'type': data[2] };
+	                                    return React.createElement(
+	                                        'tr',
+	                                        null,
+	                                        React.createElement(
+	                                            'td',
+	                                            null,
+	                                            issue['title']
+	                                        ),
+	                                        React.createElement(
+	                                            'td',
+	                                            null,
+	                                            issue['type']
+	                                        ),
+	                                        React.createElement(
+	                                            'td',
+	                                            null,
+	                                            issue['assignee']
+	                                        )
+	                                    );
+	                                })
+	                            )
+	                        )
+	                    )
+	                )
 	            )
 	        );
 	    }
@@ -25606,17 +25655,50 @@
 
 	    render: function () {
 	        return React.createElement(
-	            'form',
-	            { onSubmit: this.handleSubmit },
-	            React.createElement('input', { type: 'text', placeholder: 'username', ref: 'username' }),
-	            ' ',
-	            React.createElement('br', null),
-	            React.createElement('input', { type: 'password', placeholder: 'password', ref: 'pass' }),
-	            ' ',
-	            React.createElement('br', null),
-	            React.createElement('input', { type: 'submit' }),
-	            ' ',
-	            React.createElement('br', null)
+	            'div',
+	            { className: 'container' },
+	            React.createElement(
+	                'h1',
+	                { className: 'welcome text-center' },
+	                'Welcome to Focus Meter '
+	            ),
+	            React.createElement(
+	                'div',
+	                { className: 'card card-container' },
+	                React.createElement(
+	                    'h2',
+	                    { className: 'login_title text-center' },
+	                    'Login'
+	                ),
+	                React.createElement('hr', null),
+	                React.createElement(
+	                    'form',
+	                    { onSubmit: this.handleSubmit, className: 'form-signin' },
+	                    React.createElement('span', { id: 'reauth-email', className: 'reauth-email' }),
+	                    React.createElement(
+	                        'p',
+	                        { className: 'input_title' },
+	                        'Username'
+	                    ),
+	                    React.createElement('input', { type: 'text', ref: 'username', className: 'login_box', placeholder: 'username', required: true, autofocus: true }),
+	                    React.createElement(
+	                        'p',
+	                        { className: 'input_title' },
+	                        'Password'
+	                    ),
+	                    React.createElement('input', { type: 'password', ref: 'pass', className: 'login_box', placeholder: 'password', required: true }),
+	                    React.createElement(
+	                        'div',
+	                        { id: 'remember', className: 'checkbox' },
+	                        React.createElement('label', null)
+	                    ),
+	                    React.createElement(
+	                        'button',
+	                        { className: 'btn btn-lg btn-primary', type: 'submit' },
+	                        'Login'
+	                    )
+	                )
+	            )
 	        );
 	    }
 	});
