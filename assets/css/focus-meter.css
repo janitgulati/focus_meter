@@ -32,7 +32,7 @@ Responsive navbar-brand image CSS
 
 /* EXAMPLE 8 - Center Background */
 .example-8 .navbar-brand {
-  background: url("focus-meter.png") center / contain no-repeat;
+  background: url("images/focus-meter.png") center / contain no-repeat;
   width: 200px;
   transform: translateX(-50%);
   left: 50%;
