@@ -1,0 +1,77 @@
+/**********************************
+Responsive navbar-brand image CSS
+- Remove navbar-brand padding for firefox bug workaround
+- add 100% height and width auto ... similar to how bootstrap img-responsive class works
+***********************************/
+
+.navbar-brand {
+  padding: 0px;
+}
+.navbar-brand>img {
+  height: 100%;
+  padding: 15px;
+  width: auto;
+}
+
+
+/* EXAMPLE 8 - Center on mobile*/
+	@media only screen and (max-width : 768px){
+  .example-8 .navbar-brand {
+  padding: 0px;
+  transform: translateX(-50%);
+  left: 50%;
+  position: absolute;
+}
+.example-8 .navbar-brand>img {
+  height: 100%;
+  width: auto;
+  padding: 7px 14px;
+}
+}
+
+
+/* EXAMPLE 8 - Center Background */
+.example-8 .navbar-brand {
+  background: url("focus-meter.png") center / contain no-repeat;
+  width: 200px;
+  transform: translateX(-50%);
+  left: 50%;
+  position: absolute;
+}
+
+/* CSS Transform Align Navbar Brand Text ... This could also be achieved with table / table-cells */
+.navbar-alignit .navbar-header {
+	  -webkit-transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  height: 50px;
+}
+.navbar-alignit .navbar-brand {
+	top: 50%;
+	display: block;
+	position: relative;
+	height: auto;
+	transform: translate(0,-50%);
+	margin-right: 15px;
+  margin-left: 15px;
+}
+
+
+
+.navbar-nav>li>.dropdown-menu {
+	z-index: 9999;
+}
+
+p.sprint-data-heading, span.choose-sprint-span {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.choose-sprint-div.text-center {
+    margin-top: 60px;
+    margin-bottom:10px;
+}
+
+body {
+  font-family: "Lato";
+}

@@ -35403,17 +35403,50 @@
 
 	    render: function () {
 	        return React.createElement(
-	            'form',
-	            { onSubmit: this.handleSubmit },
-	            React.createElement('input', { type: 'text', placeholder: 'username', ref: 'username' }),
-	            ' ',
-	            React.createElement('br', null),
-	            React.createElement('input', { type: 'password', placeholder: 'password', ref: 'pass' }),
-	            ' ',
-	            React.createElement('br', null),
-	            React.createElement('input', { type: 'submit' }),
-	            ' ',
-	            React.createElement('br', null)
+	            'div',
+	            { className: 'container' },
+	            React.createElement(
+	                'h1',
+	                { className: 'welcome text-center' },
+	                'Welcome to Focus Meter '
+	            ),
+	            React.createElement(
+	                'div',
+	                { className: 'card card-container' },
+	                React.createElement(
+	                    'h2',
+	                    { className: 'login_title text-center' },
+	                    'Login'
+	                ),
+	                React.createElement('hr', null),
+	                React.createElement(
+	                    'form',
+	                    { onSubmit: this.handleSubmit, className: 'form-signin' },
+	                    React.createElement('span', { id: 'reauth-email', className: 'reauth-email' }),
+	                    React.createElement(
+	                        'p',
+	                        { className: 'input_title' },
+	                        'Username'
+	                    ),
+	                    React.createElement('input', { type: 'text', ref: 'username', className: 'login_box', placeholder: 'username', required: true, autofocus: true }),
+	                    React.createElement(
+	                        'p',
+	                        { className: 'input_title' },
+	                        'Password'
+	                    ),
+	                    React.createElement('input', { type: 'password', ref: 'pass', className: 'login_box', placeholder: 'password', required: true }),
+	                    React.createElement(
+	                        'div',
+	                        { id: 'remember', className: 'checkbox' },
+	                        React.createElement('label', null)
+	                    ),
+	                    React.createElement(
+	                        'button',
+	                        { className: 'btn btn-lg btn-primary', type: 'submit' },
+	                        'Login'
+	                    )
+	                )
+	            )
 	        );
 	    }
 	});
