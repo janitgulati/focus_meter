@@ -93,12 +93,24 @@ module.exports = React.createClass({
               </tbody>
             </table>
           </div>
+          <div className="row footer-div">
+            <hr />
+            <div className="col-lg-12">
+              <div className="col-md-8">
+                <a href="#">Terms of Service</a> | <a href="#">Privacy</a>
+              </div>
+              <div className="col-md-4">
+                <p className="muted pull-right">© 2017; developed by Udit, Janit and Nakul.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-        <h1>You are now logged in, {this.state.user.username}</h1>
-        <div> {this.state.active_sprint_name} </div>
-        <button onClick={this.logoutHandler}>Log out</button>
-        </div>
+
+            <h1>You are now logged in, {this.state.user.username}</h1>
+            <div> {this.state.active_sprint_name} </div>
+            <button onClick={this.logoutHandler}>Log out</button>
+            </div>
         )        
     }
 })
