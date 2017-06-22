@@ -166,7 +166,10 @@ class Sprints(APIView):
     server = "https://mpulsemobile.atlassian.net"
 
     def get(self, request):
-        return self.get_sprints_information(request)
+        if request.GET.get('sprint_id'):
+            return self.get_selected_sprint_information(request)
+        else:
+            return self.get_sprints_information(request)
 
     def get_sprints_information(self, request):
         """
@@ -203,9 +206,6 @@ class Sprints(APIView):
         }
         """
 
-        global jira_obj
-        global boards
-        global issues_list
         status = 201
         sprint_info_dict = {}
         user = "janit.gulati@mpulsemobile.com"
@@ -225,10 +225,14 @@ class Sprints(APIView):
             if sprints:
                 sprint_info_dict['sprints'] = []
                 for sprint in sprints:
-                    sprint_info_dict['sprints'].append({
-                        "sprint_name": sprint.name,
-                        "sprint_id": sprint.id
-                    })
+                    # sprint_info_dict['sprints'].append({
+                    #     "sprint_name": sprint.name,
+                    #     "sprint_id": sprint.id
+                    # })
+
+                    sprint_info_dict['sprints'].append(
+                        sprint.name + "#-#" + str(sprint.id)
+                    )
 
             active_sprints_obj = filter(lambda sprint: sprint.state == 'ACTIVE', sprints)
 
@@ -238,6 +242,22 @@ class Sprints(APIView):
                     sprint_info_dict['active_sprint_id'] = active_sprint.id
 
             issues_list = jira_obj.search_issues('sprint=%s'%sprint_info_dict['active_sprint_id'])
+
+            issues = []
+            for issue in issues_list:
+                # issues.append({
+                #  'title': issue.raw['key'],
+                # 'assignee': issue.raw['fields']['assignee']['emailAddress'],
+                # 'type': issue.raw['fields']['issuetype']['name']
+                #  })
+
+                issues.append(
+                    str(issue.raw['key']) + "#-#" + str(issue.raw['fields']['assignee']['emailAddress']) + "#-#" +
+                    str(issue.raw['fields']['issuetype']['name'])
+                )
+
+            sprint_info_dict['active_sprint_issues'] = issues
+
             sprint_info_dict['active_sprint_issue_count'] = len(issues_list)
             future_sprints_obj = filter(lambda sprint: sprint.state == 'FUTURE', sprints)
 
@@ -245,6 +265,100 @@ class Sprints(APIView):
                 future_sprints = []
                 for future_sprint in future_sprints_obj:
                     future_sprints.append({'sprint_name': future_sprint.name, 'sprint_id':future_sprint.id})
+                sprint_info_dict['future_sprints'] = future_sprints
+
+            sprint_info_dict['error'] = ''
+
+        except JIRAError as e:
+            status = 400
+            sprint_info_dict['error'] = 'Error in Retrieving Information'
+
+        return HttpResponse(json.dumps(sprint_info_dict), status=status, content_type='application/json')
+
+    def get_selected_sprint_information(self, request):
+        """
+
+        Args:
+            request:
+
+        Returns: {
+            board: board_name,
+            sprints: [
+                        {
+                            "sprint_id": 1,
+                            "sprint_name": "janit"
+                        },
+                        {
+                            "sprint_id": 1,
+                            "sprint_name": "janit"
+                        }
+                ],
+            active_sprint_name: ,
+            active_sprint_id: ,
+            active_sprint_issue_count: ,
+            future_sprints: [
+                        {
+                            "sprint_id": 1,
+                            "sprint_name": "janit"
+                        },
+                        {
+                            "sprint_id": 1,
+                            "sprint_name": "janit"
+                        }
+                ]
+
+        }
+        """
+
+        status = 201
+        sprint_info_dict = {}
+        user = "janit.gulati@mpulsemobile.com"
+        password = "appworks@99"
+
+        sprints = None
+        sprint_id = request.GET.get('sprint_id')
+        try:
+
+            jira_obj = JIRA(server=self.server, basic_auth=(user, password))
+            boards = jira_obj.boards()
+
+            for board in boards:
+                if 'mPulse' in board.name:
+                    sprint_info_dict['board'] = board.name
+                    sprints = jira_obj.sprints(board.id)
+
+            selected_sprints_obj = filter(lambda sprint: sprint.id == int(sprint_id), sprints)
+
+            if selected_sprints_obj:
+                for selected_sprint in selected_sprints_obj:
+                    sprint_info_dict['active_sprint_name'] = selected_sprint.name
+                    sprint_info_dict['active_sprint_id'] = selected_sprint.id
+
+            issues_list = jira_obj.search_issues('sprint=%s' % sprint_info_dict['active_sprint_id'])
+
+            issues = []
+            for issue in issues_list:
+                # issues.append({
+                #  'title': issue.raw['key'],
+                # 'assignee': issue.raw['fields']['assignee']['emailAddress'],
+                # 'type': issue.raw['fields']['issuetype']['name']
+                #  })
+
+                issues.append(
+                        str(issue.raw['key']) + "#-#" + str(
+                                issue.raw['fields']['assignee']['emailAddress']) + "#-#" +
+                        str(issue.raw['fields']['issuetype']['name'])
+                )
+
+            sprint_info_dict['active_sprint_issues'] = issues
+
+            sprint_info_dict['active_sprint_issue_count'] = len(issues_list)
+            future_sprints_obj = filter(lambda sprint: sprint.state == 'FUTURE', sprints)
+
+            if future_sprints_obj:
+                future_sprints = []
+                for future_sprint in future_sprints_obj:
+                    future_sprints.append({'sprint_name': future_sprint.name, 'sprint_id': future_sprint.id})
                 sprint_info_dict['future_sprints'] = future_sprints
 
             sprint_info_dict['error'] = ''

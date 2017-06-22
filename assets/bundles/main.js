@@ -48,7 +48,7 @@
 	var ReactDOM = __webpack_require__(158);
 	var Router = __webpack_require__(159);
 	var App = __webpack_require__(222);
-	var Login = __webpack_require__(225);
+	var Login = __webpack_require__(223);
 	var auth = __webpack_require__(224);
 
 	function requireAuth(nextState, replace) {
@@ -25430,7 +25430,12 @@
 	    getInitialState: function () {
 	        return {
 	            'user': [],
-	            'active_sprint_name': ""
+	            'active_sprint_name': "",
+	            'active_sprint_id': "",
+	            'active_sprint_issue_count': "",
+	            'sprints': [],
+	            'active_sprint_issues': [],
+	            'loader': true
 	        };
 	    },
 
@@ -25462,6 +25467,27 @@
 	        });
 	    },
 
+	    onSelectLoadSprintData: function (event) {
+	        var sprint_id = event.target.value;
+
+	        this.setState({ loader: true });
+	        $.ajax({
+	            method: 'GET',
+	            url: '/api/sprints/?sprint_id=' + sprint_id,
+	            datatype: 'json',
+	            headers: {
+	                'Authorization': 'Token ' + localStorage.token
+	            },
+	            success: function (res) {
+	                this.setState({ active_sprint_name: res.active_sprint_name,
+	                    active_sprint_id: res.active_sprint_id,
+	                    active_sprint_issue_count: res.active_sprint_issue_count,
+	                    loader: false,
+	                    active_sprint_issues: res.active_sprint_issues });
+	            }.bind(this)
+	        });
+	    },
+
 	    loadSprintsData: function () {
 	        $.ajax({
 	            method: 'GET',
@@ -25471,13 +25497,18 @@
 	                'Authorization': 'Token ' + localStorage.token
 	            },
 	            success: function (res) {
-	                debugger;
-	                this.setState({ active_sprint_name: res.active_sprint_name });
+	                this.setState({ active_sprint_name: res.active_sprint_name,
+	                    active_sprint_id: res.active_sprint_id,
+	                    active_sprint_issue_count: res.active_sprint_issue_count,
+	                    loader: false,
+	                    sprints: res.sprints,
+	                    active_sprint_issues: res.active_sprint_issues });
 	            }.bind(this)
 	        });
 	    },
 
 	    render: function () {
+	        var active_sprint_id = this.state.active_sprint_id;
 	        return React.createElement(
 	            'div',
 	            null,
@@ -25489,10 +25520,54 @@
 	            ),
 	            React.createElement(
 	                'div',
-	                null,
-	                ' ',
-	                this.state.active_sprint_name,
-	                ' '
+	                { style: { display: this.state.loader ? 'block' : 'none' } },
+	                ' Loading...'
+	            ),
+	            React.createElement(
+	                'div',
+	                { style: { display: this.state.loader ? 'none' : 'block' } },
+	                React.createElement(
+	                    'div',
+	                    null,
+	                    ' ',
+	                    this.state.active_sprint_name,
+	                    '   '
+	                ),
+	                React.createElement(
+	                    'select',
+	                    { onChange: this.onSelectLoadSprintData },
+	                    this.state.sprints.map(function (sprint) {
+	                        var data = sprint.split('#-#');
+	                        return React.createElement(
+	                            'option',
+	                            { value: data[1], selected: active_sprint_id == data[1] },
+	                            ' ',
+	                            data[0]
+	                        );
+	                    })
+	                ),
+	                React.createElement('br', null),
+	                React.createElement('br', null),
+	                React.createElement(
+	                    'h2',
+	                    null,
+	                    'Active Sprint Issues'
+	                ),
+	                React.createElement(
+	                    'ol',
+	                    null,
+	                    this.state.active_sprint_issues.map(function (_issue) {
+	                        var data = _issue.split('#-#');
+	                        var issue = { 'title': data[0], 'assignee': data[1], 'type': data[2] };
+	                        return React.createElement(
+	                            'li',
+	                            null,
+	                            data[0],
+	                            ', ',
+	                            issue['assignee']
+	                        );
+	                    })
+	                )
 	            ),
 	            React.createElement(
 	                'button',
@@ -25502,10 +25577,104 @@
 	        );
 	    }
 	});
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(223)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(225)))
 
 /***/ }),
 /* 223 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(1);
+	var auth = __webpack_require__(224);
+
+	module.exports = React.createClass({
+	    displayName: 'exports',
+
+	    contextTypes: {
+	        router: React.PropTypes.object.isRequired
+	    },
+
+	    handleSubmit: function (e) {
+	        e.preventDefault();
+
+	        var username = this.refs.username.value;
+	        var pass = this.refs.pass.value;
+
+	        auth.login(username, pass, loggedIn => {
+	            this.context.router.replace('/app/');
+	        });
+	    },
+
+	    render: function () {
+	        return React.createElement(
+	            'form',
+	            { onSubmit: this.handleSubmit },
+	            React.createElement('input', { type: 'text', placeholder: 'username', ref: 'username' }),
+	            ' ',
+	            React.createElement('br', null),
+	            React.createElement('input', { type: 'password', placeholder: 'password', ref: 'pass' }),
+	            ' ',
+	            React.createElement('br', null),
+	            React.createElement('input', { type: 'submit' }),
+	            ' ',
+	            React.createElement('br', null)
+	        );
+	    }
+	});
+
+/***/ }),
+/* 224 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function($) {module.exports = {
+	    login: function (username, pass, cb) {
+	        if (localStorage.token) {
+	            if (cb) cb(true);
+	            return;
+	        }
+	        this.getToken(username, pass, res => {
+	            if (res.authenticated) {
+	                localStorage.token = res.token;
+	                if (cb) cb(true);
+	            } else {
+	                if (cb) cb(false);
+	            }
+	        });
+	    },
+
+	    logout: function () {
+	        delete localStorage.token;
+	    },
+
+	    loggedIn: function () {
+	        return !!localStorage.token;
+	    },
+
+	    getToken: function (username, pass, cb) {
+	        $.ajax({
+	            type: 'POST',
+	            url: '/account/login/',
+	            data: {
+	                username: username,
+	                password: pass
+	            },
+	            success: function (res) {
+	                debugger;
+	                if (res.successful) {
+	                    cb({
+	                        authenticated: true,
+	                        token: res.token
+	                    });
+	                } else {
+	                    alert(res.reason);
+	                }
+	            }
+	        });
+	    }
+	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(225)))
+
+/***/ }),
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -35323,100 +35492,6 @@
 	return jQuery;
 	}));
 
-
-/***/ }),
-/* 224 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function($) {module.exports = {
-	    login: function (username, pass, cb) {
-	        if (localStorage.token) {
-	            if (cb) cb(true);
-	            return;
-	        }
-	        this.getToken(username, pass, res => {
-	            if (res.authenticated) {
-	                localStorage.token = res.token;
-	                if (cb) cb(true);
-	            } else {
-	                if (cb) cb(false);
-	            }
-	        });
-	    },
-
-	    logout: function () {
-	        delete localStorage.token;
-	    },
-
-	    loggedIn: function () {
-	        return !!localStorage.token;
-	    },
-
-	    getToken: function (username, pass, cb) {
-	        $.ajax({
-	            type: 'POST',
-	            url: '/account/login/',
-	            data: {
-	                username: username,
-	                password: pass
-	            },
-	            success: function (res) {
-	                debugger;
-	                if (res.successful) {
-	                    cb({
-	                        authenticated: true,
-	                        token: res.token
-	                    });
-	                } else {
-	                    alert(res.reason);
-	                }
-	            }
-	        });
-	    }
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(223)))
-
-/***/ }),
-/* 225 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(1);
-	var auth = __webpack_require__(224);
-
-	module.exports = React.createClass({
-	    displayName: 'exports',
-
-	    contextTypes: {
-	        router: React.PropTypes.object.isRequired
-	    },
-
-	    handleSubmit: function (e) {
-	        e.preventDefault();
-
-	        var username = this.refs.username.value;
-	        var pass = this.refs.pass.value;
-
-	        auth.login(username, pass, loggedIn => {
-	            this.context.router.replace('/app/');
-	        });
-	    },
-
-	    render: function () {
-	        return React.createElement(
-	            'form',
-	            { onSubmit: this.handleSubmit },
-	            React.createElement('input', { type: 'text', placeholder: 'username', ref: 'username' }),
-	            ' ',
-	            React.createElement('br', null),
-	            React.createElement('input', { type: 'password', placeholder: 'password', ref: 'pass' }),
-	            ' ',
-	            React.createElement('br', null),
-	            React.createElement('input', { type: 'submit' }),
-	            ' ',
-	            React.createElement('br', null)
-	        );
-	    }
-	});
 
 /***/ })
 /******/ ]);
